@@ -16,10 +16,7 @@ export type AuthActionState = {
   message?: string;
 };
 
-export async function signUp(
-  _prevState: AuthActionState,
-  formData: FormData,
-) {
+export async function signUp(formData: FormData) {
   const payload = {
     email: String(formData.get("email") ?? "").trim(),
     password: String(formData.get("password") ?? ""),
@@ -43,10 +40,7 @@ export async function signUp(
   redirect("/dashboard");
 }
 
-export async function signIn(
-  _prevState: AuthActionState,
-  formData: FormData,
-) {
+export async function signIn(formData: FormData) {
   const payload = {
     email: String(formData.get("email") ?? "").trim(),
     password: String(formData.get("password") ?? ""),
@@ -76,14 +70,7 @@ export async function signOut() {
   redirect("/login");
 }
 
-export async function sendPasswordReset(
-  arg1: AuthActionState | FormData,
-  arg2?: FormData,
-) {
-  const formData = arg1 instanceof FormData ? arg1 : arg2;
-  if (!formData) {
-    return { ok: false, message: "Invalid submission." };
-  }
+export async function sendPasswordReset(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   const parsed = z.string().email("Enter a valid email.").safeParse(email);
 
@@ -120,14 +107,7 @@ export async function sendPasswordReset(
   redirect("/forgot-password/sent");
 }
 
-export async function updatePassword(
-  arg1: AuthActionState | FormData,
-  arg2?: FormData,
-) {
-  const formData = arg1 instanceof FormData ? arg1 : arg2;
-  if (!formData) {
-    return { ok: false, message: "Invalid submission." };
-  }
+export async function updatePassword(formData: FormData) {
   const password = String(formData.get("password") ?? "");
   const confirm = String(formData.get("confirm") ?? "");
 

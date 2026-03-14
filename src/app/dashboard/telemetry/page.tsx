@@ -22,7 +22,7 @@ type TelemetryRow = {
   value: number;
   unit: string | null;
   recorded_at: string;
-  equipment: { name: string | null } | null;
+  equipment: { name: string | null }[] | null;
 };
 
 const PAGE_SIZE = 20;
@@ -134,7 +134,7 @@ export default async function TelemetryPage({
           {telemetry && telemetry.length > 0 ? (
             (telemetry as TelemetryRow[]).map((row) => (
               <TableRow key={row.id}>
-                <TableCell>{row.equipment?.name ?? "—"}</TableCell>
+                      <TableCell>{row.equipment?.[0]?.name ?? "—"}</TableCell>
                 <TableCell className="font-medium">{row.metric}</TableCell>
                 <TableCell>
                   {row.value}

@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 type AuthFormProps = {
   title: string;
   subtitle: string;
-  action: (state: AuthActionState, formData: FormData) => Promise<AuthActionState | void>;
+  action: (formData: FormData) => Promise<AuthActionState | void>;
   submitLabel: string;
   footer: ReactNode;
 };
@@ -24,7 +24,10 @@ export function AuthForm({
   submitLabel,
   footer,
 }: AuthFormProps) {
-  const [state, formAction, pending] = useActionState(action, initialState);
+  const [state, formAction, pending] = useActionState(
+    async (_prev: AuthActionState | void, formData: FormData) => action(formData),
+    initialState,
+  );
 
   return (
     <form
@@ -36,7 +39,7 @@ export function AuthForm({
         <p className="text-sm text-muted-foreground">{subtitle}</p>
       </div>
 
-      {state.message ? (
+      {state && "message" in state && state.message ? (
         <p className="rounded-lg border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive">
           {state.message}
         </p>

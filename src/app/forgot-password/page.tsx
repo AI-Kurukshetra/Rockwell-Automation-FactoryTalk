@@ -6,6 +6,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function ForgotPasswordPage() {
+  async function handleReset(formData: FormData) {
+    "use server";
+    await sendPasswordReset(formData);
+  }
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,_oklch(0.98_0.02_220),_oklch(1_0_0)_60%)] px-6 py-16">
       <div className="w-full max-w-md space-y-6">
@@ -13,7 +18,7 @@ export default function ForgotPasswordPage() {
           <Link href="/login">← Back to login</Link>
         </Button>
         <form
-          action={sendPasswordReset}
+          action={handleReset}
           className="grid gap-4 rounded-3xl border border-border/70 bg-card/80 p-8 shadow-lg"
         >
           <div className="space-y-2">

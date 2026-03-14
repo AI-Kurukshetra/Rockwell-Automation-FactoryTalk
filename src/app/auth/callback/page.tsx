@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { createClient } from "@/lib/supabase/client";
 
-export default function AuthCallbackPage() {
+function CallbackInner() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -45,5 +45,24 @@ export default function AuthCallbackPage() {
         </p>
       </div>
     </main>
+  );
+}
+
+export default function AuthCallbackPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(circle_at_top,_oklch(0.98_0.02_220),_oklch(1_0_0)_60%)] px-6 py-16">
+          <div className="w-full max-w-md space-y-4 rounded-3xl border border-border/70 bg-card/80 p-8 text-center shadow-lg">
+            <h1 className="text-2xl font-semibold">Preparing secure session</h1>
+            <p className="text-sm text-muted-foreground">
+              Redirecting you to reset your password.
+            </p>
+          </div>
+        </main>
+      }
+    >
+      <CallbackInner />
+    </Suspense>
   );
 }
