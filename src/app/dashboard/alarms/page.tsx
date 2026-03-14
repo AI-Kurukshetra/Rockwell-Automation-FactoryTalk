@@ -29,7 +29,7 @@ type AlarmRow = {
   created_at: string;
   acknowledged_at: string | null;
   resolved_at: string | null;
-  equipment: { name: string | null } | null;
+  equipment: { name: string | null }[] | null;
 };
 
 const PAGE_SIZE = 20;
@@ -162,7 +162,7 @@ export default async function AlarmsPage({
                     ) : null}
                   </div>
                 </TableCell>
-                <TableCell>{alarm.equipment?.name ?? "—"}</TableCell>
+                      <TableCell>{alarm.equipment?.[0]?.name ?? "—"}</TableCell>
                 <TableCell>
                   <AlarmSeverityBadge severity={alarm.severity} />
                 </TableCell>
