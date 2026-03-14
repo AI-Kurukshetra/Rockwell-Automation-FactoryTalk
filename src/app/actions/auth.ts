@@ -91,10 +91,11 @@ export async function sendPasswordReset(
     return { ok: false, message: parsed.error.issues[0]?.message };
   }
 
+  const headerList = await headers();
   const origin =
     process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ??
-    headers().get("origin");
+    headerList.get("origin");
 
   if (!origin) {
     return {
