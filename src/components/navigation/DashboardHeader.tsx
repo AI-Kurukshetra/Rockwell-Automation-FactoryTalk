@@ -89,6 +89,9 @@ export function DashboardHeader({
           <Button variant={isActive("/dashboard/quality") ? "default" : "outline"} asChild>
             <Link href="/dashboard/quality">Quality</Link>
           </Button>
+          <Button variant={isActive("/dashboard/dashboards") ? "default" : "outline"} asChild>
+            <Link href="/dashboard/dashboards">Dashboards</Link>
+          </Button>
           <Button variant={isActive("/dashboard/production") ? "default" : "outline"} asChild>
             <Link href="/dashboard/production">Production</Link>
           </Button>

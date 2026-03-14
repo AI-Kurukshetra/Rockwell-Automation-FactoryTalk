@@ -124,6 +124,30 @@ create table if not exists public.scada_connections (
   )
 );
 
+create table if not exists public.dashboards (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  name text not null,
+  description text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.dashboard_widgets (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  dashboard_id uuid not null references public.dashboards (id) on delete cascade,
+  title text not null,
+  type text not null default 'kpi',
+  config text,
+  position text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint widget_type_check check (
+    type in ('kpi', 'chart', 'table', 'text')
+  )
+);
+
 create or replace function public.set_updated_at()
 returns trigger as $$
 begin
@@ -167,6 +191,20 @@ before update on public.scada_connections
 for each row
 execute procedure public.set_updated_at();
 
+drop trigger if exists set_dashboard_updated_at on public.dashboards;
+
+create trigger set_dashboard_updated_at
+before update on public.dashboards
+for each row
+execute procedure public.set_updated_at();
+
+drop trigger if exists set_widget_updated_at on public.dashboard_widgets;
+
+create trigger set_widget_updated_at
+before update on public.dashboard_widgets
+for each row
+execute procedure public.set_updated_at();
+
 alter table public.equipment enable row level security;
 alter table public.alarms enable row level security;
 alter table public.telemetry enable row level security;
@@ -174,6 +212,8 @@ alter table public.production_orders enable row level security;
 alter table public.quality_records enable row level security;
 alter table public.event_logs enable row level security;
 alter table public.scada_connections enable row level security;
+alter table public.dashboards enable row level security;
+alter table public.dashboard_widgets enable row level security;
 
 drop policy if exists "Equipment read" on public.equipment;
 create policy "Equipment read"
@@ -347,5 +387,55 @@ with check (auth.uid() = user_id);
 drop policy if exists "Scada delete" on public.scada_connections;
 create policy "Scada delete"
 on public.scada_connections
+for delete
+using (auth.uid() = user_id);
+
+drop policy if exists "Dashboards read" on public.dashboards;
+create policy "Dashboards read"
+on public.dashboards
+for select
+using (auth.uid() = user_id);
+
+drop policy if exists "Dashboards insert" on public.dashboards;
+create policy "Dashboards insert"
+on public.dashboards
+for insert
+with check (auth.uid() = user_id);
+
+drop policy if exists "Dashboards update" on public.dashboards;
+create policy "Dashboards update"
+on public.dashboards
+for update
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
+
+drop policy if exists "Dashboards delete" on public.dashboards;
+create policy "Dashboards delete"
+on public.dashboards
+for delete
+using (auth.uid() = user_id);
+
+drop policy if exists "Widgets read" on public.dashboard_widgets;
+create policy "Widgets read"
+on public.dashboard_widgets
+for select
+using (auth.uid() = user_id);
+
+drop policy if exists "Widgets insert" on public.dashboard_widgets;
+create policy "Widgets insert"
+on public.dashboard_widgets
+for insert
+with check (auth.uid() = user_id);
+
+drop policy if exists "Widgets update" on public.dashboard_widgets;
+create policy "Widgets update"
+on public.dashboard_widgets
+for update
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
+
+drop policy if exists "Widgets delete" on public.dashboard_widgets;
+create policy "Widgets delete"
+on public.dashboard_widgets
 for delete
 using (auth.uid() = user_id);

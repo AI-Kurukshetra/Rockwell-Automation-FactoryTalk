@@ -649,4 +649,67 @@ begin
     status = excluded.status,
     last_sync = excluded.last_sync,
     notes = excluded.notes;
+
+  with seed_dashboards as (
+    select
+      uuid_generate_v5(seed_namespace, 'dashboard:' || name) as id,
+      seed_user as user_id,
+      name,
+      description
+    from (
+      values
+        ('Operations Overview', 'High-level KPIs and live status'),
+        ('Quality Focus', 'Defect trends and inspection results'),
+        ('Production Pulse', 'Schedule performance and throughput')
+    ) as v(name, description)
+  )
+  insert into public.dashboards (id, user_id, name, description)
+  select id, user_id, name, description
+  from seed_dashboards
+  on conflict (id) do update set
+    name = excluded.name,
+    description = excluded.description;
+
+  with seed_widgets as (
+    select
+      uuid_generate_v5(seed_namespace, 'widget:' || dashboard_name || ':' || title) as id,
+      seed_user as user_id,
+      (select id from public.dashboards where user_id = seed_user and name = dashboard_name limit 1) as dashboard_id,
+      title,
+      type,
+      config,
+      position
+    from (
+      values
+        ('Operations Overview', 'OEE KPI', 'kpi', '{"metric":"oee","range":"24h"}', 'row-1 / col-1'),
+        ('Operations Overview', 'Alarm Heatmap', 'chart', '{"metric":"alarms","range":"7d"}', 'row-1 / col-2'),
+        ('Operations Overview', 'Live Equipment', 'table', '{"source":"equipment","limit":10}', 'row-2 / col-1-2'),
+        ('Quality Focus', 'Defect Rate', 'kpi', '{"metric":"defect_rate","range":"7d"}', 'row-1 / col-1'),
+        ('Quality Focus', 'Top Defects', 'chart', '{"metric":"defects","range":"30d"}', 'row-1 / col-2'),
+        ('Production Pulse', 'Schedule Timeline', 'chart', '{"metric":"schedule","range":"48h"}', 'row-1 / col-1-2')
+    ) as v(dashboard_name, title, type, config, position)
+  )
+  insert into public.dashboard_widgets (
+    id,
+    user_id,
+    dashboard_id,
+    title,
+    type,
+    config,
+    position
+  )
+  select
+    id,
+    user_id,
+    dashboard_id,
+    title,
+    type,
+    config,
+    position
+  from seed_widgets
+  on conflict (id) do update set
+    title = excluded.title,
+    type = excluded.type,
+    config = excluded.config,
+    position = excluded.position;
 end $$;

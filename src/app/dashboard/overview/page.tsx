@@ -230,6 +230,9 @@ export default async function OverviewPage() {
               <Button asChild variant="outline" className="justify-between rounded-full">
                 <Link href="/dashboard/events/new">Log event</Link>
               </Button>
+              <Button asChild variant="outline" className="justify-between rounded-full">
+                <Link href="/dashboard/dashboards/new">Create dashboard</Link>
+              </Button>
             </div>
           </div>
           <div className="rounded-2xl border border-border/70 bg-card/70 p-5 shadow-sm md:col-span-2">
