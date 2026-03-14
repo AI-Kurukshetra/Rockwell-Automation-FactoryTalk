@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { createServerClientWithCookies } from "@/lib/supabase/server";
@@ -8,10 +8,11 @@ const idSchema = z.string().uuid();
 const updateSchema = equipmentSchema.partial();
 
 export async function GET(
-  _request: Request,
-  { params }: { params: { id: string } },
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> },
 ) {
-  const parsedId = idSchema.safeParse(params.id);
+  const { id } = await context.params;
+  const parsedId = idSchema.safeParse(id);
   if (!parsedId.success) {
     return NextResponse.json({ message: "Invalid id." }, { status: 400 });
   }
@@ -37,10 +38,11 @@ export async function GET(
 }
 
 export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } },
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> },
 ) {
-  const parsedId = idSchema.safeParse(params.id);
+  const { id } = await context.params;
+  const parsedId = idSchema.safeParse(id);
   if (!parsedId.success) {
     return NextResponse.json({ message: "Invalid id." }, { status: 400 });
   }
@@ -103,10 +105,11 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  _request: Request,
-  { params }: { params: { id: string } },
+  _request: NextRequest,
+  context: { params: Promise<{ id: string }> },
 ) {
-  const parsedId = idSchema.safeParse(params.id);
+  const { id } = await context.params;
+  const parsedId = idSchema.safeParse(id);
   if (!parsedId.success) {
     return NextResponse.json({ message: "Invalid id." }, { status: 400 });
   }

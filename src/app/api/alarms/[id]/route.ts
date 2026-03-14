@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 import { createServerClientWithCookies } from "@/lib/supabase/server";
@@ -6,10 +6,11 @@ import { createServerClientWithCookies } from "@/lib/supabase/server";
 const idSchema = z.string().uuid();
 
 export async function PATCH(
-  request: Request,
-  { params }: { params: { id: string } },
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> },
 ) {
-  const parsedId = idSchema.safeParse(params.id);
+  const { id } = await context.params;
+  const parsedId = idSchema.safeParse(id);
   if (!parsedId.success) {
     return NextResponse.json({ message: "Invalid id." }, { status: 400 });
   }
